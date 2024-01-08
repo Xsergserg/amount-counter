@@ -10,10 +10,9 @@ val mockkVersion: String by project
 val kotestVersion: String by project
 
 plugins {
-    application
-    id("org.jetbrains.kotlin.jvm") version "1.9.22" apply false
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
     id("io.ktor.plugin") version "2.3.7"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
 }
 
 group = "com.example"
@@ -43,6 +42,7 @@ dependencies {
     implementation("com.h2database:h2:$h2Version")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.ktor:ktor-client-encoding:2.3.7")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
