@@ -2,10 +2,12 @@ package com.example.db
 
 import org.jetbrains.exposed.sql.Table
 
-object ProductsTable : Table() {
-    val id = integer("id").autoIncrement()
-    val name = varchar("name", 256)
+private const val VARCHAR_LENGTH = 256
+
+object ProductsTable : Table("Products") {
+    val id = long("id").uniqueIndex().autoIncrement()
+    val name = varchar("name", VARCHAR_LENGTH)
     val amount = long("age")
 
-    override val primaryKey = PrimaryKey(id)
+    override val primaryKey = PrimaryKey(id, name = "PK_Products_Id")
 }
