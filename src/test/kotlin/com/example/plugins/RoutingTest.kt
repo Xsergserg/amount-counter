@@ -3,6 +3,7 @@ package com.example.plugins
 import com.example.db.ProductsTable
 import com.example.getTestDb
 import com.example.initTestDb
+import com.example.service.PdfPrinterService
 import com.example.service.ProductsService
 import configureExceptionHandling
 import io.kotest.assertions.assertSoftly
@@ -13,6 +14,8 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -94,12 +97,39 @@ class RoutingTest {
         }
     }
 
-    private fun ApplicationTestBuilder.testHttpClient(): HttpClient {
+    @Test
+    fun `get summary endpoint should return status code internal server error (500) in case ids not provided`() {
+        testApplication {
+            val pdfPrinterService = mockk<PdfPrinterService>().also {
+                every { it.printProductSummaryToByteArray(any()) } throws NumberFormatException()
+            }
+            testHttpClient(pdfPrinterService = pdfPrinterService).get(
+                "/api/getSummary?ids=1,2,3",
+            ).status shouldBe HttpStatusCode.InternalServerError
+        }
+    }
+
+    @Test
+    fun `get summary endpoint should return status code internal server error (500) in case of uncaught exception`() {
+        testApplication {
+            val productsService = mockk<ProductsService>().also {
+                every { it.getProductsSummary(any()) } throws NullPointerException()
+            }
+            testHttpClient(productsService).get(
+                "/api/getSummary?ids=1,2,3",
+            ).status shouldBe HttpStatusCode.InternalServerError
+        }
+    }
+
+    private fun ApplicationTestBuilder.testHttpClient(
+        productsService: ProductsService = service,
+        pdfPrinterService: PdfPrinterService = PdfPrinterService(),
+    ): HttpClient {
         environment {
             module {
                 configureExceptionHandling()
                 configureSerialization()
-                configureRouting(productsService = service)
+                configureRouting(productsService = productsService, pdfPrinterService = pdfPrinterService)
             }
         }
         return createClient {}
