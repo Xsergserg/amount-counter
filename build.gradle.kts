@@ -5,6 +5,7 @@ val logbackVersion: String by project
 val prometheusVersion: String by project
 val exposedVersion: String by project
 val h2Version: String by project
+val openPdfVersion: String by project
 
 val mockkVersion: String by project
 val kotestVersion: String by project
@@ -42,11 +43,13 @@ dependencies {
     implementation("com.h2database:h2:$h2Version")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("io.ktor:ktor-client-encoding:2.3.7")
+    implementation("io.ktor:ktor-client-encoding:$ktorVersion")
+    implementation("com.github.librepdf:openpdf:$openPdfVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
 }
 
 tasks.withType<Test>().configureEach {
