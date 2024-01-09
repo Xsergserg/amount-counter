@@ -1,6 +1,7 @@
 val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
+val kotlinLoggingVersion: String by project
 
 val prometheusVersion: String by project
 val exposedVersion: String by project
@@ -42,9 +43,11 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("com.h2database:h2:$h2Version")
     implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.ktor:ktor-client-encoding:$ktorVersion")
     implementation("com.github.librepdf:openpdf:$openPdfVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
