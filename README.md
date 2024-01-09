@@ -61,7 +61,7 @@ docker build -t amount-counter .
 ```
 
 ```shell
-docker run -dp 8080:8080 amount-counter`
+docker run -dp 8080:8080 amount-counter
 ```
 
 ## Additional info
