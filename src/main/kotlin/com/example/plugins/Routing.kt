@@ -35,7 +35,6 @@ fun Application.configureRouting(
                 val productsSummary = productsService.getProductsSummary(ids)
                 runCatching {
                     val outputStream = pdfPrinterService.printProductSummaryToByteArray(productsSummary)
-                    call.response.header(HttpHeaders.ContentType, "application/pdf")
                     call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=SummaryTable.pdf")
                     call.respondOutputStream(ContentType.parse("application/pdf")) {
                         outputStream.use { it.writeTo(this) }

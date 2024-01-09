@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.plugins.configureDatabases
+import com.example.plugins.configureHTTP
 import com.example.plugins.configureLogging
 import com.example.plugins.configureMonitoring
 import com.example.plugins.configureRouting
@@ -24,6 +25,7 @@ fun Application.module() {
     configureLogging()
     configureMonitoring()
     configureSerialization()
+    configureHTTP()
     configureRouting(ProductsService(db))
     configureSwagger()
 }
