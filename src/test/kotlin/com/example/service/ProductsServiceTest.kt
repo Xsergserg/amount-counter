@@ -62,23 +62,23 @@ class ProductsServiceTest {
         val expected =
             ProductsSummary(
                 products =
-                    listOf(
-                        Product(
-                            id = 1,
-                            name = "Diablo IV",
-                            amount = 10L,
-                        ),
-                        Product(
-                            id = 2,
-                            name = "Overwatch 2",
-                            amount = 1L,
-                        ),
-                        Product(
-                            id = 4,
-                            name = "CyberPunk 2077",
-                            amount = 50L,
-                        ),
+                listOf(
+                    Product(
+                        id = 1,
+                        name = "Diablo IV",
+                        amount = 10L,
                     ),
+                    Product(
+                        id = 2,
+                        name = "Overwatch 2",
+                        amount = 1L,
+                    ),
+                    Product(
+                        id = 4,
+                        name = "CyberPunk 2077",
+                        amount = 50L,
+                    ),
+                ),
                 total = 61L,
             )
         service.getProductsSummary(listOf(1, 2, 4)) shouldBe expected
