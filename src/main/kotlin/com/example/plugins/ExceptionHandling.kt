@@ -17,12 +17,12 @@ fun Application.configureExceptionHandling() {
             when (e) {
                 is BadRequestException -> {
                     log.info(e) { "Bad request" }
-                    call.respond(BadRequest)
+                    call.respond(BadRequest, e.message)
                 }
 
                 is ItemsNotFoundException -> {
                     log.info(e) { "Items not found" }
-                    call.respond(BadRequest)
+                    call.respond(BadRequest, "One or more requested elements are not found")
                 }
 
                 is PdfWriterException -> {
