@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.UUID
 
 class ProductsServiceTest {
     private val db = getTestDb().also { initTestDb(it) }
@@ -30,26 +31,31 @@ class ProductsServiceTest {
             listOf(
                 Product(
                     id = 1,
+                    uuid = UUID.fromString("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4"),
                     name = "Diablo IV",
                     amount = 10L,
                 ),
                 Product(
                     id = 2,
+                    uuid = UUID.fromString("bf70093e-a4d4-461b-86ff-6515feee9bb3"),
                     name = "Overwatch 2",
                     amount = 1L,
                 ),
                 Product(
                     id = 3,
+                    uuid = UUID.fromString("d2c02017-61f7-4609-9fa0-da6887aff9c6"),
                     name = "Half-Life 3",
                     amount = 10000L,
                 ),
                 Product(
                     id = 4,
+                    uuid = UUID.fromString("a4d5e97a-e2c6-46c6-aec0-ddc2a6ca5bfc"),
                     name = "CyberPunk 2077",
                     amount = 50L,
                 ),
                 Product(
                     id = 5,
+                    uuid = UUID.fromString("1603b0c2-952e-4400-89b4-49d2e3ee0e62"),
                     name = "God of War: Ragnarok",
                     amount = 5L,
                 ),
@@ -65,23 +71,32 @@ class ProductsServiceTest {
                 listOf(
                     Product(
                         id = 1,
+                        uuid = UUID.fromString("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4"),
                         name = "Diablo IV",
                         amount = 10L,
                     ),
                     Product(
                         id = 2,
+                        uuid = UUID.fromString("bf70093e-a4d4-461b-86ff-6515feee9bb3"),
                         name = "Overwatch 2",
                         amount = 1L,
                     ),
                     Product(
                         id = 4,
+                        uuid = UUID.fromString("a4d5e97a-e2c6-46c6-aec0-ddc2a6ca5bfc"),
                         name = "CyberPunk 2077",
                         amount = 50L,
                     ),
                 ),
                 total = 61L,
             )
-        service.getProductsSummary(listOf(1, 2, 4)) shouldBe expected
+        service.getProductsSummary(
+            listOf(
+                UUID.fromString("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4"),
+                UUID.fromString("bf70093e-a4d4-461b-86ff-6515feee9bb3"),
+                UUID.fromString("a4d5e97a-e2c6-46c6-aec0-ddc2a6ca5bfc"),
+            ),
+        ) shouldBe expected
     }
 
     @Test
@@ -96,12 +111,15 @@ class ProductsServiceTest {
         assertThrows<ItemsNotFoundException> {
             service.getProductsSummary(
                 listOf(
-                    1,
-                    2,
-                    6,
-                    8,
+                    UUID.fromString("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4"),
+                    UUID.fromString("bf70093e-a4d4-461b-86ff-6515feee9bb3"),
+                    UUID.fromString("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e5"),
+                    UUID.fromString("bf70093e-a4d4-461b-86ff-6515feee9bb6"),
                 ),
             )
-        }.apply { message shouldBe "Requested ids [6, 8] not found" }
+        }.apply {
+            message shouldBe "Requested ids [bfcfaa0a-e878-48b5-85c8-a4f20e52b3e5, " +
+                "bf70093e-a4d4-461b-86ff-6515feee9bb6] not found"
+        }
     }
 }

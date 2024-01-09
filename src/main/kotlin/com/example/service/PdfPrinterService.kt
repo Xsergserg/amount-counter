@@ -50,7 +50,7 @@ class PdfPrinterService {
             },
         )
         productsSummary.products.map {
-            addTextCell(it.id)
+            addTextCell(it.uuid)
             addTextCell(it.name)
             addTextCell(it.amount)
         }

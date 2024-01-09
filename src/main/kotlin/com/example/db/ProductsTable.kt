@@ -6,6 +6,7 @@ private const val VARCHAR_LENGTH = 256
 
 object ProductsTable : Table("Products") {
     val id = long("id").uniqueIndex().autoIncrement()
+    val uuid = uuid("uuid").uniqueIndex().autoGenerate().index()
     val name = varchar("name", VARCHAR_LENGTH)
     val amount = long("amount")
 
