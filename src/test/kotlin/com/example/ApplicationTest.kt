@@ -47,7 +47,7 @@ class ApplicationTest {
     @Test
     fun `swager request returns OK(200) response`() {
         testApplication {
-            testHttpClient().get("/swagger").status shouldBe OK
+            testHttpClient().get("/docs/swagger").status shouldBe OK
         }
     }
 
