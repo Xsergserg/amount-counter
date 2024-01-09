@@ -9,19 +9,20 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.UUID
 
 class ProductsService(private val db: Database) {
     fun getAllProducts(): List<Product> {
         return transaction(db) { ProductsTable.selectAll().map { it.toProduct() }.sortedBy { it.id } }
     }
 
-    fun getProductsSummary(ids: List<Long>): ProductsSummary {
+    fun getProductsSummary(uuids: List<UUID>): ProductsSummary {
         val products =
             transaction(db) {
-                ProductsTable.select { ProductsTable.id inList ids }.map { it.toProduct() }.sortedBy { it.id }
+                ProductsTable.select { ProductsTable.uuid inList uuids }.map { it.toProduct() }.sortedBy { it.id }
             }
-        if (products.size != ids.size) {
-            throw ItemsNotFoundException(ids.filter { it !in products.map { product -> product.id } })
+        if (products.size != uuids.size) {
+            throw ItemsNotFoundException(uuids.filter { it !in products.map { product -> product.uuid } })
         }
         return ProductsSummary(
             products = products,

@@ -1,6 +1,7 @@
 package com.example.routing
 
 import com.example.db.ProductsTable
+import com.example.dto.IdsRequestDto
 import com.example.getTestDb
 import com.example.initTestDb
 import com.example.plugins.configureSerialization
@@ -10,9 +11,15 @@ import configureExceptionHandling
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import io.mockk.every
@@ -80,27 +87,47 @@ class ProductRoutingTest {
     @Test
     fun `get summary endpoint should return status code OK(200)`() {
         testApplication {
-            testHttpClient().get(
-                "/api/getSummary?ids=bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4," +
-                    "bf70093e-a4d4-461b-86ff-6515feee9bb3,d2c02017-61f7-4609-9fa0-da6887aff9c6",
-            ).status shouldBe HttpStatusCode.OK
+            testHttpClient().post(
+                "/api/getSummary",
+            ) {
+                setBody(
+                    IdsRequestDto(
+                        ids = listOf(
+                            "bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4",
+                            "bf70093e-a4d4-461b-86ff-6515feee9bb3",
+                            "d2c02017-61f7-4609-9fa0-da6887aff9c6",
+                        ),
+                    ),
+                )
+                contentType(ContentType.Application.Json)
+            }.status shouldBe HttpStatusCode.OK
         }
     }
 
     @Test
     fun `get summary endpoint should return status code BadRequest(400) in case of not existed ids requested`() {
         testApplication {
-            testHttpClient().get(
-                "/api/getSummary?ids=bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4," +
-                    "bf70093e-a4d4-461b-86ff-6515feee9bb3,bf70093e-a4d4-461b-86ff-6515feee9bb4",
-            ).status shouldBe HttpStatusCode.BadRequest
+            testHttpClient().post(
+                "/api/getSummary",
+            ) {
+                setBody(
+                    IdsRequestDto(
+                        ids = listOf(
+                            "bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4",
+                            "bf70093e-a4d4-461b-86ff-6515feee9bb3",
+                            "111111",
+                        ),
+                    ),
+                )
+                contentType(ContentType.Application.Json)
+            }.status shouldBe HttpStatusCode.BadRequest
         }
     }
 
     @Test
     fun `get summary endpoint should return status code BadRequest(400) in case ids not provided`() {
         testApplication {
-            testHttpClient().get("/api/getSummary").status shouldBe HttpStatusCode.BadRequest
+            testHttpClient().post("/api/getSummary").status shouldBe HttpStatusCode.BadRequest
         }
     }
 
@@ -110,9 +137,12 @@ class ProductRoutingTest {
             val pdfPrinterService = mockk<PdfPrinterService>().also {
                 every { it.printProductSummaryToByteArray(any()) } throws NumberFormatException()
             }
-            testHttpClient(pdfPrinterService = pdfPrinterService).get(
-                "/api/getSummary?ids=1,2,3",
-            ).status shouldBe HttpStatusCode.InternalServerError
+            testHttpClient(pdfPrinterService = pdfPrinterService).post(
+                "/api/getSummary",
+            ) {
+                setBody(IdsRequestDto(listOf("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4")))
+                contentType(ContentType.Application.Json)
+            }.status shouldBe HttpStatusCode.InternalServerError
         }
     }
 
@@ -122,9 +152,12 @@ class ProductRoutingTest {
             val productsService = mockk<ProductsService>().also {
                 every { it.getProductsSummary(any()) } throws NullPointerException()
             }
-            testHttpClient(productsService).get(
-                "/api/getSummary?ids=1,2,3",
-            ).status shouldBe HttpStatusCode.InternalServerError
+            testHttpClient(productsService = productsService).post(
+                "/api/getSummary",
+            ) {
+                setBody(IdsRequestDto(listOf("bfcfaa0a-e878-48b5-85c8-a4f20e52b3e4")))
+                contentType(ContentType.Application.Json)
+            }.status shouldBe HttpStatusCode.InternalServerError
         }
     }
 
@@ -139,6 +172,10 @@ class ProductRoutingTest {
                 configureProductRouting(productsService, pdfPrinterService)
             }
         }
-        return createClient {}
+        return createClient {
+            install(ContentNegotiation) {
+                json()
+            }
+        }
     }
 }

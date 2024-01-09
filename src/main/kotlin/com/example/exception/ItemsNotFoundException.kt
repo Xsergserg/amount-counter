@@ -1,3 +1,5 @@
 package com.example.exception
 
-class ItemsNotFoundException(ids: List<Long>) : RuntimeException("Requested ids $ids not found")
+import java.util.UUID
+
+class ItemsNotFoundException(uuids: List<UUID>) : RuntimeException("Requested ids $uuids not found")

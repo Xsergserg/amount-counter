@@ -5,14 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProductDto(
-    val id: Long,
+    val id: String,
     val name: String,
     val amount: Long,
 )
 
 fun Product.toProductDto(): ProductDto {
     return ProductDto(
-        id = id,
+        id = uuid.toString(),
         name = name,
         amount = amount,
     )

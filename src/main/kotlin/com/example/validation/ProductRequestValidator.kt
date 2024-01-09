@@ -1,24 +1,20 @@
 package com.example.validation
 
+import com.example.dto.IdsRequestDto
 import com.example.exception.BadRequestException
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.receive
+import java.util.UUID
 
 class ProductRequestValidator {
-    @Suppress("ThrowsCount")
-    fun validateAndExecute(
-        ids: String?,
-        execute: String.() -> List<Long>,
-    ): List<Long> {
-        if (ids == null) {
-            throw BadRequestException("'ids' parameter is required")
+    suspend fun validateRequestBodyAndReturnUuids(call: ApplicationCall): List<UUID> {
+        return runCatching {
+            call.receive<IdsRequestDto>().ids.takeUnless { it.isEmpty() }?.map(UUID::fromString)
+                ?: throw BadRequestException("'ids' list is empty")
         }
-        return runCatching { ids.execute() }
             .onFailure { ex ->
-                throw BadRequestException(
-                    "'ids' parameter has wrong format. Parameter should be formatted as '%d,%d,..'",
-                    ex,
-                )
+                throw BadRequestException("Request body should contain ids list in form '{\"ids\":[\"id1\",\"id2\"]}'", ex)
             }
-            .onSuccess { parsedIds -> if (parsedIds.isEmpty()) throw BadRequestException("'ids' list is empty") }
             .getOrThrow()
     }
 }
