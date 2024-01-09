@@ -4,6 +4,7 @@ import com.example.db.ProductsTable
 import com.example.getTestDb
 import com.example.initTestDb
 import com.example.service.ProductsService
+import configureExceptionHandling
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -79,9 +80,24 @@ class RoutingTest {
         }
     }
 
+    @Test
+    fun `get summary endpoint should return status code BadRequest(400) in case of not existed ids requested`() {
+        testApplication {
+            testHttpClient().get("/api/getSummary?ids=1,2,6").status shouldBe HttpStatusCode.BadRequest
+        }
+    }
+
+    @Test
+    fun `get summary endpoint should return status code BadRequest(400) in case ids not provided`() {
+        testApplication {
+            testHttpClient().get("/api/getSummary").status shouldBe HttpStatusCode.BadRequest
+        }
+    }
+
     private fun ApplicationTestBuilder.testHttpClient(): HttpClient {
         environment {
             module {
+                configureExceptionHandling()
                 configureSerialization()
                 configureRouting(productsService = service)
             }
