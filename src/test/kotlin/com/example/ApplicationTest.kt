@@ -1,13 +1,9 @@
 package com.example
 
-import com.example.plugins.configureHTTP
-import com.example.plugins.configureLogging
 import com.example.plugins.configureMonitoring
 import com.example.plugins.configureRouting
 import com.example.plugins.configureSerialization
 import com.example.plugins.configureSwagger
-import com.example.service.ProductsService
-import configureExceptionHandling
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
@@ -24,14 +20,8 @@ class ApplicationTest {
             testApplication {
                 application {
                     val db = getTestDb()
-
-                    configureExceptionHandling()
-                    configureLogging()
-                    configureMonitoring()
-                    configureSerialization()
-                    configureHTTP()
-                    configureRouting(ProductsService(db))
-                    configureSwagger()
+                    configurePlugins()
+                    configureRouting(db)
                 }
             }
         }

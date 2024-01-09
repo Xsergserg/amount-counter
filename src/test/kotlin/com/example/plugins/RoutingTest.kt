@@ -3,6 +3,7 @@ package com.example.plugins
 import com.example.db.ProductsTable
 import com.example.getTestDb
 import com.example.initTestDb
+import com.example.routing.configureProductRouting
 import com.example.service.PdfPrinterService
 import com.example.service.ProductsService
 import configureExceptionHandling
@@ -129,7 +130,7 @@ class RoutingTest {
             module {
                 configureExceptionHandling()
                 configureSerialization()
-                configureRouting(productsService = productsService, pdfPrinterService = pdfPrinterService)
+                configureProductRouting(productsService, pdfPrinterService)
             }
         }
         return createClient {}

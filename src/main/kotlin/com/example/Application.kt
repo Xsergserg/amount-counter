@@ -7,7 +7,6 @@ import com.example.plugins.configureMonitoring
 import com.example.plugins.configureRouting
 import com.example.plugins.configureSerialization
 import com.example.plugins.configureSwagger
-import com.example.service.ProductsService
 import configureExceptionHandling
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
@@ -20,12 +19,15 @@ fun main() {
 
 fun Application.module() {
     val db = configureDatabases()
+    configurePlugins()
+    configureRouting(db)
+}
 
+fun Application.configurePlugins() {
     configureExceptionHandling()
     configureLogging()
     configureMonitoring()
     configureSerialization()
     configureHTTP()
-    configureRouting(ProductsService(db))
     configureSwagger()
 }
