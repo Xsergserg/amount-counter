@@ -21,23 +21,22 @@ paths:
         "500":
           description: "Internal server error"
   /api/getSummary:
-    get:
+    post:
       tags:
         - Controller
-      description: "Get products summary pdf file"
-      parameters:
-        - in: query
-          required: true
-          name: ids
-          schema:
-            type: string
-          description: ids list which should be included to pdf report
-          example: 1,2,3
+      description: "Download products summary pdf file"
+      requestBody:
+        description: Ids list
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsRequestDto'
       responses:
         "200":
           description: "OK"
           content:
-            application/pdf:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
@@ -47,13 +46,23 @@ paths:
           description: "Internal server error"
 components:
   schemas:
+    IdsRequestDto:
+      title: ProductRequestBody
+      type: object
+      properties:
+        ids:
+          type: array
+          example: [ "5d6aa284-0f05-49f5-b563-f83c3d2ffd90","77ac3a82-6a9c-427e-b281-a0a73b8a5847","1e0b7134-cfd1-4a0b-89b2-9c2616478f36" ]
+          items:
+            type: string
+            example: "1e0b7134-cfd1-4a0b-89b2-9c2616478f36"
     Product:
       title: Product
       type: object
       properties:
         id:
-          type: integer
-          example: 1
+          type: string
+          example: "1e0b7134-cfd1-4a0b-89b2-9c2616478f36"
         name:
           type: string
           example: "Diablo IV"
