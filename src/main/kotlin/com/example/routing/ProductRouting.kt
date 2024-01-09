@@ -13,6 +13,7 @@ import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondOutputStream
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 
@@ -27,16 +28,13 @@ fun Application.configureProductRouting(
                 call.respond(productsService.getAllProducts().map { it.toProductDto() })
             }
 
-            get("/getSummary") {
-                val ids: List<Long> =
-                    validator.validateAndExecute(call.parameters["ids"]) {
-                        split(',').map { it.toLong() }
-                    }
-                val productsSummary = productsService.getProductsSummary(ids)
+            post("/getSummary") {
+                val uuids = validator.validateRequestBodyAndReturnUuids(call)
+                val productsSummary = productsService.getProductsSummary(uuids)
                 runCatching {
                     val outputStream = pdfPrinterService.printProductSummaryToByteArray(productsSummary)
                     call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=SummaryTable.pdf")
-                    call.respondOutputStream(ContentType.parse("application/pdf")) {
+                    call.respondOutputStream(ContentType.Application.OctetStream) {
                         outputStream.use { it.writeTo(this) }
                     }
                 }
